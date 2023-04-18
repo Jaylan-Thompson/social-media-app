@@ -1,0 +1,130 @@
+import React, { useState } from "react";
+
+function App() {
+  const [user, setUser] = useState(null);
+
+  const handleLogin = (username, password) => {
+    // Call backend API to verify user credentials
+    // If valid, set user state with user object containing user details
+    setUser({
+      username,
+      email: "example@email.com",
+      bio: "Hello, I'm a user on this social media app!",
+      posts: [],
+    });
+  };
+
+  const handleLogout = () => {
+    // Call backend API to logout user
+    // Clear user state
+    setUser(null);
+  };
+
+  const handlePost = (text) => {
+    // Call backend API to create new post
+    // Add new post object to user's posts array
+    const newPost = {
+      text,
+      timestamp: new Date(),
+      likes: [],
+      comments: [],
+    };
+    setUser({
+      ...user,
+      posts: [newPost, ...user.posts],
+    });
+  };
+
+  if (!user) {
+    return <LoginForm onLogin={handleLogin} />;
+  }
+
+  return (
+    <div>
+      <ProfileHeader user={user} onLogout={handleLogout} />
+      <PostForm onPost={handlePost} />
+      {user.posts.map((post) => (
+        <Post key={post.timestamp} post={post} />
+      ))}
+    </div>
+  );
+}
+
+function LoginForm({ onLogin }) {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    onLogin(username, password);
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <h2>Login</h2>
+      <div>
+        <label htmlFor="username">Username:</label>
+        <input
+          type="text"
+          id="username"
+          value={username}
+          onChange={(event) => setUsername(event.target.value)}
+        />
+      </div>
+      <div>
+        <label htmlFor="password">Password:</label>
+        <input
+          type="password"
+          id="password"
+          value={password}
+          onChange={(event) => setPassword(event.target.value)}
+        />
+      </div>
+      <button type="submit">Submit</button>
+    </form>
+  );
+}
+
+function ProfileHeader({ user, onLogout }) {
+  return (
+    <div>
+      <h1>Welcome, {user.username}!</h1>
+      <button onClick={onLogout}>Logout</button>
+      <p>{user.email}</p>
+      <p>{user.bio}</p>
+    </div>
+  );
+}
+
+function PostForm({ onPost }) {
+  const [text, setText] = useState("");
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    onPost(text);
+    setText("");
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <h2>Create Post</h2>
+      <div>
+        <label htmlFor="text">Text:</label>
+        <textarea
+          id="text"
+          value={text}
+          onChange={(event) => setText(event.target.value)}
+        />
+      </div>
+      <button type="submit">Submit</button>
+    </form>
+  );
+}
+
+function Post({ post }) {
+  return (
+    <div>
+      <p>{post.text}</p>
+      <p>{post.timestamp.toLocaleString()}</p>
+      <button>{post.likes.length} Likes</button>
+      <button>{post.comments.length} Comments</
